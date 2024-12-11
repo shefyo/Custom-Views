@@ -18,14 +18,15 @@ class StatsView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
+    startPosition: Float = 0F
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
     private var radius = 0F
     private var center = PointF(0F, 0F)
     private var oval = RectF(0F, 0F, 0F, 0F)
-
     private var lineWidth = AndroidUtils.dp(context, 5F).toFloat()
     private var fontSize = AndroidUtils.dp(context, 40F).toFloat()
     private var colors = emptyList<Int>()
+    private var startPosition = startPosition
 
     init {
         context.withStyledAttributes(attrs, R.styleable.StatsView) {
@@ -42,6 +43,7 @@ class StatsView @JvmOverloads constructor(
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
     }
+
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
@@ -79,12 +81,12 @@ class StatsView @JvmOverloads constructor(
             return
         }
 
-        var startFrom = -90F
+        var currentAngle = startPosition
         for ((index, datum) in calculatedData.withIndex()) {
             val angle = 360F * datum
             paint.color = colors.getOrNull(index) ?: randomColor()
-            canvas.drawArc(oval, startFrom, angle, false, paint)
-            startFrom += angle
+            canvas.drawArc(oval, currentAngle, angle, false, paint)
+            currentAngle += angle
         }
 
         canvas.drawText(
